@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from app.db.base import Base
 from app.db.session import get_db
 from app.main import create_app
+from app.core.rate_limit import rate_limiter
 
 
 @pytest.fixture()
@@ -27,6 +28,7 @@ def db_session() -> Session:
 
 @pytest.fixture()
 def client(db_session: Session) -> TestClient:
+    rate_limiter.reset()
     app = create_app()
 
     def override_get_db():
@@ -37,4 +39,3 @@ def client(db_session: Session) -> TestClient:
 
     app.dependency_overrides[get_db] = override_get_db
     return TestClient(app)
-

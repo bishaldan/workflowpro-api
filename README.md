@@ -16,6 +16,10 @@ This project is built as a senior Python backend portfolio project. It demonstra
 - Docker Compose
 - Pytest
 - GitHub Actions
+- Structured request logging
+- Request ID middleware
+- Consistent error responses
+- Lightweight rate limiting
 
 ## Current Features
 
@@ -35,7 +39,32 @@ This project is built as a senior Python backend portfolio project. It demonstra
 - Database-backed notification records
 - Project CSV export jobs with download endpoint
 - Celery task modules for exports and overdue task summaries
+- Request ID response headers
+- Consistent validation/error response format
+- In-memory rate limiter for login and write endpoints
+- Demo seed data script
 - Test suite using FastAPI TestClient
+
+## Architecture
+
+```text
+Client / Swagger UI
+        |
+        v
+FastAPI application
+        |
+        +-- Auth / JWT / RBAC
+        +-- Organization tenancy
+        +-- Project and task APIs
+        +-- Activity, analytics, notifications
+        +-- CSV export workflow
+        |
+        v
+SQLAlchemy models + Alembic migrations
+        |
+        +-- PostgreSQL in Docker
+        +-- Redis-backed Celery worker modules
+```
 
 ## Local Setup
 
@@ -56,6 +85,22 @@ Run tests locally:
 pip install -e ".[dev]"
 pytest
 ```
+
+Seed demo data:
+
+```bash
+python scripts/seed_demo.py
+```
+
+Demo credentials:
+
+```text
+owner@example.com / password123
+member@example.com / password123
+viewer@example.com / password123
+```
+
+API examples are available in [docs/api-examples.md](docs/api-examples.md).
 
 ## API Overview
 
@@ -81,8 +126,21 @@ GET  /api/v1/organizations/{organization_id}/exports/{export_id}
 GET  /api/v1/organizations/{organization_id}/exports/{export_id}/download
 ```
 
+## Error Shape
+
+```json
+{
+  "error": {
+    "code": "validation_error",
+    "message": "Request validation failed",
+    "request_id": "4ec26bf1-9f21-4ed7-bd2f-28a6b8df68c4",
+    "details": []
+  }
+}
+```
+
 ## Portfolio Positioning
 
 CV summary:
 
-> Built a production-style multi-tenant FastAPI backend with JWT authentication, role-based access control, organization invitations, project/task APIs, filtering, activity logs, analytics, database-backed notifications, Celery/Redis background-job modules, CSV export jobs, PostgreSQL migrations, Docker Compose infrastructure, and automated Pytest/GitHub Actions CI.
+> Built a production-style multi-tenant FastAPI backend with JWT authentication, RBAC, organization invitations, project/task APIs, filtering, activity logs, analytics, database-backed notifications, Celery/Redis job modules, CSV export workflows, structured request logging, request IDs, rate limiting, PostgreSQL migrations, Docker infrastructure, automated tests, and GitHub Actions CI.

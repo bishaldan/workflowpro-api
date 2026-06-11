@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 60
     database_url: str = "sqlite:///./workflowpro.db"
     redis_url: str = "redis://localhost:6379/0"
+    rate_limit_requests: int = 120
+    rate_limit_window_seconds: int = 60
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
@@ -22,4 +24,3 @@ def get_settings() -> Settings:
 
 
 settings = get_settings()
-
