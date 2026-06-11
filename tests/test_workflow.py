@@ -143,3 +143,95 @@ def test_viewer_cannot_create_project(client):
         headers=viewer_headers,
     )
     assert project_response.status_code == 403
+
+
+def test_task_assignment_creates_notification(client):
+    owner_headers = auth_headers(client)
+    member_headers = auth_headers(client, email="assignee@example.com", name="Assignee User")
+
+    org_response = client.post(
+        "/api/v1/organizations",
+        json={"name": "Notify Co", "slug": "notify-co"},
+        headers=owner_headers,
+    )
+    organization_id = org_response.json()["id"]
+    invitation_response = client.post(
+        f"/api/v1/organizations/{organization_id}/invitations",
+        json={"email": "assignee@example.com", "role": "member"},
+        headers=owner_headers,
+    )
+    invitation_id = invitation_response.json()["id"]
+    accept_response = client.post(
+        f"/api/v1/organizations/{organization_id}/invitations/{invitation_id}/accept",
+        headers=member_headers,
+    )
+    assignee_id = accept_response.json()["user_id"]
+
+    project_response = client.post(
+        f"/api/v1/organizations/{organization_id}/projects",
+        json={"name": "Notification Project"},
+        headers=owner_headers,
+    )
+    project_id = project_response.json()["id"]
+    task_response = client.post(
+        f"/api/v1/organizations/{organization_id}/tasks",
+        json={
+            "project_id": project_id,
+            "title": "Review assigned task",
+            "assignee_id": assignee_id,
+        },
+        headers=owner_headers,
+    )
+    assert task_response.status_code == 201
+
+    notifications_response = client.get(
+        f"/api/v1/organizations/{organization_id}/notifications",
+        headers=member_headers,
+    )
+    assert notifications_response.status_code == 200
+    assert notifications_response.json()[0]["type"] == "task_assigned"
+
+
+def test_project_export_generates_csv_and_notification(client):
+    headers = auth_headers(client)
+    org_response = client.post(
+        "/api/v1/organizations",
+        json={"name": "Export Co", "slug": "export-co"},
+        headers=headers,
+    )
+    organization_id = org_response.json()["id"]
+    project_response = client.post(
+        f"/api/v1/organizations/{organization_id}/projects",
+        json={"name": "Reporting Project"},
+        headers=headers,
+    )
+    project_id = project_response.json()["id"]
+    client.post(
+        f"/api/v1/organizations/{organization_id}/tasks",
+        json={"project_id": project_id, "title": "Export this task", "priority": "urgent"},
+        headers=headers,
+    )
+
+    export_response = client.post(
+        f"/api/v1/organizations/{organization_id}/exports",
+        json={"project_id": project_id},
+        headers=headers,
+    )
+    assert export_response.status_code == 201
+    assert export_response.json()["status"] == "completed"
+    export_id = export_response.json()["id"]
+
+    download_response = client.get(
+        f"/api/v1/organizations/{organization_id}/exports/{export_id}/download",
+        headers=headers,
+    )
+    assert download_response.status_code == 200
+    assert "Export this task" in download_response.text
+    assert "text/csv" in download_response.headers["content-type"]
+
+    notifications_response = client.get(
+        f"/api/v1/organizations/{organization_id}/notifications",
+        headers=headers,
+    )
+    assert notifications_response.status_code == 200
+    assert notifications_response.json()[0]["type"] == "export_completed"

@@ -14,6 +14,19 @@ class InvitationStatus(StrEnum):
     revoked = "revoked"
 
 
+class ExportJobStatus(StrEnum):
+    pending = "pending"
+    processing = "processing"
+    completed = "completed"
+    failed = "failed"
+
+
+class NotificationType(StrEnum):
+    task_assigned = "task_assigned"
+    overdue_summary = "overdue_summary"
+    export_completed = "export_completed"
+
+
 class ProjectStatus(StrEnum):
     active = "active"
     archived = "archived"

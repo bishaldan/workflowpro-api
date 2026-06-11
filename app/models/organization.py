@@ -48,7 +48,10 @@ class OrganizationInvitation(Base):
     organization_id: Mapped[int] = mapped_column(ForeignKey("organizations.id", ondelete="CASCADE"), index=True)
     email: Mapped[str] = mapped_column(String(255), index=True, nullable=False)
     role: Mapped[OrganizationRole] = mapped_column(Enum(OrganizationRole), default=OrganizationRole.member)
-    status: Mapped[InvitationStatus] = mapped_column(Enum(InvitationStatus), default=InvitationStatus.pending)
+    status: Mapped[InvitationStatus] = mapped_column(
+        Enum(InvitationStatus, native_enum=False),
+        default=InvitationStatus.pending,
+    )
     invited_by_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
     accepted_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))

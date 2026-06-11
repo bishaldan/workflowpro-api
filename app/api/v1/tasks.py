@@ -4,13 +4,14 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user, require_org_member, require_org_writer
 from app.db.session import get_db
-from app.models.enums import TaskPriority, TaskStatus
+from app.models.enums import NotificationType, TaskPriority, TaskStatus
 from app.models.organization import OrganizationMember
 from app.models.project import Project
 from app.models.task import Task
 from app.models.user import User
 from app.schemas.task import TaskCreate, TaskRead, TaskUpdate
 from app.services.activity import log_activity
+from app.services.notifications import create_notification
 
 router = APIRouter()
 
@@ -53,6 +54,15 @@ def create_task(
         entity_id=task.id,
         message=f"Created task {task.title}",
     )
+    if task.assignee_id is not None:
+        create_notification(
+            db,
+            organization_id=organization_id,
+            user_id=task.assignee_id,
+            type_=NotificationType.task_assigned,
+            title="New task assigned",
+            body=f"You were assigned to {task.title}.",
+        )
     db.commit()
     db.refresh(task)
     return task
@@ -109,6 +119,7 @@ def update_task(
         if assignee_member is None:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Assignee is not a member")
 
+    original_assignee_id = task.assignee_id
     original_status = task.status
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(task, field, value)
@@ -121,6 +132,15 @@ def update_task(
             entity_type="task",
             entity_id=task.id,
             message=f"Changed task {task.title} status to {task.status.value}",
+        )
+    if task.assignee_id is not None and task.assignee_id != original_assignee_id:
+        create_notification(
+            db,
+            organization_id=organization_id,
+            user_id=task.assignee_id,
+            type_=NotificationType.task_assigned,
+            title="Task reassigned to you",
+            body=f"You were assigned to {task.title}.",
         )
     db.commit()
     db.refresh(task)

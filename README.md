@@ -32,6 +32,9 @@ This project is built as a senior Python backend portfolio project. It demonstra
 - Basic role-based write protection
 - Activity log API
 - Organization analytics API
+- Database-backed notification records
+- Project CSV export jobs with download endpoint
+- Celery task modules for exports and overdue task summaries
 - Test suite using FastAPI TestClient
 
 ## Local Setup
@@ -72,10 +75,14 @@ POST /api/v1/organizations/{organization_id}/tasks
 GET  /api/v1/organizations/{organization_id}/tasks
 GET  /api/v1/organizations/{organization_id}/activity
 GET  /api/v1/organizations/{organization_id}/analytics
+GET  /api/v1/organizations/{organization_id}/notifications
+POST /api/v1/organizations/{organization_id}/exports
+GET  /api/v1/organizations/{organization_id}/exports/{export_id}
+GET  /api/v1/organizations/{organization_id}/exports/{export_id}/download
 ```
 
 ## Portfolio Positioning
 
 CV summary:
 
-> Built a production-style multi-tenant FastAPI backend with JWT authentication, role-based access control, organization invitations, project/task APIs, filtering, activity logs, analytics, PostgreSQL migrations, Celery/Redis-ready background jobs, Docker Compose infrastructure, and automated Pytest/GitHub Actions CI.
+> Built a production-style multi-tenant FastAPI backend with JWT authentication, role-based access control, organization invitations, project/task APIs, filtering, activity logs, analytics, database-backed notifications, Celery/Redis background-job modules, CSV export jobs, PostgreSQL migrations, Docker Compose infrastructure, and automated Pytest/GitHub Actions CI.
