@@ -25,9 +25,13 @@ This project is built as a senior Python backend portfolio project. It demonstra
 - Password hashing
 - Organization creation
 - Organization membership with roles
+- Organization invitations and acceptance flow
 - Project CRUD scoped by organization
 - Task CRUD scoped by organization and project
+- Pagination, search, and task filters
 - Basic role-based write protection
+- Activity log API
+- Organization analytics API
 - Test suite using FastAPI TestClient
 
 ## Local Setup
@@ -59,15 +63,19 @@ POST /api/v1/auth/login
 GET  /api/v1/users/me
 POST /api/v1/organizations
 GET  /api/v1/organizations
+GET  /api/v1/organizations/{organization_id}/members
+POST /api/v1/organizations/{organization_id}/invitations
+POST /api/v1/organizations/{organization_id}/invitations/{invitation_id}/accept
 POST /api/v1/organizations/{organization_id}/projects
 GET  /api/v1/organizations/{organization_id}/projects
 POST /api/v1/organizations/{organization_id}/tasks
 GET  /api/v1/organizations/{organization_id}/tasks
+GET  /api/v1/organizations/{organization_id}/activity
+GET  /api/v1/organizations/{organization_id}/analytics
 ```
 
 ## Portfolio Positioning
 
 CV summary:
 
-> Built a production-style multi-tenant FastAPI backend with JWT authentication, role-based access control, PostgreSQL, SQLAlchemy, Alembic migrations, Celery/Redis-ready background jobs, Docker Compose infrastructure, and automated Pytest/GitHub Actions CI.
-
+> Built a production-style multi-tenant FastAPI backend with JWT authentication, role-based access control, organization invitations, project/task APIs, filtering, activity logs, analytics, PostgreSQL migrations, Celery/Redis-ready background jobs, Docker Compose infrastructure, and automated Pytest/GitHub Actions CI.

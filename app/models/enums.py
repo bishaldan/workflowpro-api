@@ -8,6 +8,12 @@ class OrganizationRole(StrEnum):
     viewer = "viewer"
 
 
+class InvitationStatus(StrEnum):
+    pending = "pending"
+    accepted = "accepted"
+    revoked = "revoked"
+
+
 class ProjectStatus(StrEnum):
     active = "active"
     archived = "archived"
@@ -25,4 +31,3 @@ class TaskStatus(StrEnum):
     in_progress = "in_progress"
     blocked = "blocked"
     done = "done"
-

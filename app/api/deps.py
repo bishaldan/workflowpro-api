@@ -66,6 +66,19 @@ def require_org_writer(
     return membership
 
 
+def require_org_admin(
+    organization_id: int,
+    user: User,
+    db: Session,
+) -> OrganizationMember:
+    membership = require_org_member(organization_id, user, db)
+    if membership.role not in {
+        OrganizationRole.owner,
+        OrganizationRole.admin,
+    }:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access denied")
+    return membership
+
+
 def get_db_session() -> Generator[Session, None, None]:
     yield from get_db()
-

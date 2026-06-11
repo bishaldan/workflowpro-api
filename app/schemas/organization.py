@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
 
-from app.models.enums import OrganizationRole
+from app.models.enums import InvitationStatus, OrganizationRole
 
 
 class OrganizationCreate(BaseModel):
@@ -25,3 +25,17 @@ class OrganizationMemberRead(BaseModel):
 
     model_config = {"from_attributes": True}
 
+
+class InvitationCreate(BaseModel):
+    email: EmailStr
+    role: OrganizationRole = OrganizationRole.member
+
+
+class InvitationRead(BaseModel):
+    id: int
+    organization_id: int
+    email: EmailStr
+    role: OrganizationRole
+    status: InvitationStatus
+
+    model_config = {"from_attributes": True}

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.api.v1 import auth, health, organizations, projects, tasks, users
+from app.api.v1 import activity, analytics, auth, health, organizations, projects, tasks, users
 from app.core.config import settings
 
 
@@ -12,8 +12,9 @@ def create_app() -> FastAPI:
     app.include_router(organizations.router, prefix="/api/v1/organizations", tags=["organizations"])
     app.include_router(projects.router, prefix="/api/v1/organizations", tags=["projects"])
     app.include_router(tasks.router, prefix="/api/v1/organizations", tags=["tasks"])
+    app.include_router(activity.router, prefix="/api/v1/organizations", tags=["activity"])
+    app.include_router(analytics.router, prefix="/api/v1/organizations", tags=["analytics"])
     return app
 
 
 app = create_app()
-
